@@ -12,8 +12,9 @@ public class GameFrame extends JFrame{
     }
     public static void main(String[] args){
         GameFrame frame = new GameFrame() ;
-        GamePanel panel = new GamePanel(frame) ;
-        frame.add(panel);
+        GamePanel panel = new GamePanel(frame) ;//创建窗口
+        panel.action();
+        frame.add(panel);//创建窗口
         frame.setVisible(true);//创建窗口
 
     }

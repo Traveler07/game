@@ -1,17 +1,10 @@
 package ui;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 //英雄机
-public class Hero {
-    BufferedImage img ;
-    //英雄机坐标
-     int x ;
-     int y ;
-//     英雄机大小
-     int w ;
-     int h ;
+public class Hero extends FlyObjeck {
+
      public Hero(){
          try {
              img = App.getImg("/img/hero.png");
@@ -27,8 +20,16 @@ public class Hero {
         x = mx - w/2 ;
         y = my - (h*2)/3 ;
      }
-    public void moveToKey(int kx,int ky){
-        x += kx ;
-        y += ky ;
+    public void moveUp(){
+        y -= 10 ;
+    }
+    public void moveDown(){
+        y += 10 ;
+    }
+    public void moveLeft(){
+        x-=10 ;
+    }
+    public void moveRight(){
+        x+=10 ;
     }
 }
