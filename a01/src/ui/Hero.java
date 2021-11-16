@@ -5,6 +5,8 @@ import java.io.IOException;
 //英雄机
 public class Hero extends FlyObjeck {
 
+    int hp ;
+
      public Hero(){
          try {
              img = App.getImg("/img/hero.png");
@@ -15,6 +17,7 @@ public class Hero extends FlyObjeck {
          y = 600 ;
          w = img.getWidth() ;
          h = img.getHeight() ;
+         hp = 5 ;
      }
      public void moveToMouse(int mx,int my){
         x = mx - w/2 ;

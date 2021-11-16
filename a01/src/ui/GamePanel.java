@@ -18,16 +18,22 @@ public class GamePanel extends JPanel {
     //Ep ep = new Ep();
     List<Ep> eps = new ArrayList<>();//敌机集和
     List<Fire> fs = new ArrayList<>();//英雄机弹药库
+    int score ;//分数
+    boolean gameover = false ;
 
     public void action(){
         //创建一个新的线程
         new Thread(() -> {
             while(true) {
-                epEnter();//创建敌机
-                epMove();//移动敌机
-                shoot();
-                shootEp();
-                fireMove();
+                if(!gameover) {
+                    epEnter();//创建敌机
+                    epMove();//移动敌机
+                    shoot();
+                    shootEp();
+                    hit();
+                    fireMove();
+                    gremove();
+                }
                 try {
                     Thread.sleep(20);
                     //线程休眠（毫秒）
@@ -39,18 +45,46 @@ public class GamePanel extends JPanel {
         }).start();
     }
 
-    private void shootEp() {
+    private void hit() {
+        for (int i = 0; i < eps.size(); i++) {
+            Ep e = eps.get(i);
+            if(e.hitBy(hero)){
+                hero.hp-- ;
+                eps.remove(e);
+                if(hero.hp <= 0){
+                    gameover = true ;
+//                    hero.hp = 5 ;
+//                    score = 0 ;
+                }
+            }
+        }
+    }
+
+    private void gremove() {
+        for (int i = 0; i < fs.size(); i++) {
+            Fire f = fs.get(i);
+            if (f.x < 0 && f.y < 0) {
+                fs.remove(f);
+            }
+        }
+    }
+
+    private void shootEp() {//射击敌机
         for (int i = 0; i < fs.size(); i++) {
             Fire f = fs.get(i);
             bang(f);
         }
     }
 
-    private void bang(Fire f) {
+    private void bang(Fire f) {//击中判定
         for (int i = 0; i < eps.size(); i++) {
             Ep e = eps.get(i);
             if(e.shootBy(f)){
-                eps.remove(e);
+                e.hp --;
+                if(e.hp <= 0){
+                    eps.remove(e);
+                    score++;
+                }
                 fs.remove(f);
         }
         }
@@ -82,7 +116,7 @@ public class GamePanel extends JPanel {
     public void shoot() {
         //生成，发射子弹
         findex++;
-        if(findex >=20) {
+        if(findex >=10) {//攻速
             //左
             Fire fire1 = new Fire(hero.x + 15, hero.y , 0);
             fs.add(fire1);
@@ -107,10 +141,22 @@ public class GamePanel extends JPanel {
 
 
         MouseAdapter adapter = new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(gameover){
+                    gameover = false ;
+                    score = 0 ;
+                    hero = new Hero();
+                    repaint();
+                }
+            }
+
             public void mouseMoved(MouseEvent e){
                 int mx = e.getX();
                 int my = e.getY();
-                hero.moveToMouse(mx,my);
+                if(!gameover) {
+                    hero.moveToMouse(mx, my);
+                }
                 repaint();
             }
         };//获取鼠标坐标，并，移动英雄机
@@ -154,7 +200,18 @@ public class GamePanel extends JPanel {
             g.drawImage(ep.img, ep.x, ep.y, ep.w, ep.h, null);
         }
 
-    g.drawImage(hero.img,hero.x,hero.y,hero.w,hero.h,null);//绘制英雄机
+        g.drawImage(hero.img,hero.x,hero.y,hero.w,hero.h,null);//绘制英雄机
 
+        g.setColor(Color.CYAN);
+        g.setFont(new Font("楷体",Font.BOLD,20));
+        g.drawString("分数："+ score, 10 ,35);
+        for (int i = 0; i < hero.hp; i++) {
+            g.drawImage(hero.img,5+i*35,50 ,30,30,null);
+        }
+        if(gameover) {
+            g.setColor(Color.red);
+            g.setFont(new Font("楷体", Font.BOLD, 45));
+            g.drawString("GAMEOVER!", 120, 300);
+        }
     }
 }

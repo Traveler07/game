@@ -5,6 +5,7 @@ import java.util.Random;
 
 public class Ep extends FlyObjeck{
     int sp ;//敌机速度
+    int hp ;
     public Ep (){
         Random rd = new Random();
         int r = rd.nextInt(15);
@@ -19,6 +20,7 @@ public class Ep extends FlyObjeck{
         x = rd.nextInt(512-w) ;
         y = -h ;
         sp = 16 - r ;
+        hp = 5;//敌机血量
     }
 
     public void move() {
@@ -27,6 +29,11 @@ public class Ep extends FlyObjeck{
 
     public boolean shootBy(Fire f) {
 
+        boolean hit = x<=f.x +f.w && x>= f.x - w && y<= f.y + f.h && y >= f.y - h ;
+        return hit ;
+    }
+
+    public boolean hitBy(Hero f) {
         boolean hit = x<=f.x +f.w && x>= f.x - w && y<= f.y + f.h && y >= f.y - h ;
         return hit ;
     }
