@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public class Ep extends FlyObjeck{
+    int sp ;//敌机速度
     public Ep (){
         Random rd = new Random();
         int r = rd.nextInt(15);
@@ -16,10 +17,17 @@ public class Ep extends FlyObjeck{
         w = img.getWidth() ;
         h = img.getHeight() ;
         x = rd.nextInt(512-w) ;
-        y = 0 ;
+        y = -h ;
+        sp = 16 - r ;
     }
 
     public void move() {
-        y += 1 ;
+        y += sp ;
+    }
+
+    public boolean shootBy(Fire f) {
+
+        boolean hit = x<=f.x +f.w && x>= f.x - w && y<= f.y + f.h && y >= f.y - h ;
+        return hit ;
     }
 }
