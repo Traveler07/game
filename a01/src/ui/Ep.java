@@ -29,10 +29,12 @@ public class Ep extends FlyObjeck{
         if(type == 5 ){
             x-=5;
             y += sp ;
-        }
-        if(type == 7){
+        }else if(type == 7){
             x+=5;
             y += sp ;
+        }else if(type==17){
+            y+=10 ;
+            hp = 50;
         }
         y += sp ;
     }
