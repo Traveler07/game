@@ -10,25 +10,25 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 //面板
 public class GamePanel extends JPanel {
     BufferedImage bg ;//背景图
     Hero hero = new Hero();
-    //Ep ep = new Ep();
     List<Ep> eps = new ArrayList<>();//敌机集和
-    List<Fire> fs = new ArrayList<>();//英雄机弹药库
     int score ;//分数
+    int index = 0 ;//记录生产敌机方法执行次数
     boolean gameover = false ;
-
     public void action(){
         //创建一个新的线程
         new Thread(() -> {
             while(true) {
                 if(!gameover) {
                     epEnter();//创建敌机
+                    System.out.println(hero.power);
                     epMove();//移动敌机
-                    shoot();
+                    hero.shoot();
                     shootEp();
                     hit();
                     fireMove();
@@ -44,38 +44,33 @@ public class GamePanel extends JPanel {
             }
         }).start();
     }
-
-    private void hit() {
+    private void hit() {//敌机碰撞英雄机
         for (int i = 0; i < eps.size(); i++) {
             Ep e = eps.get(i);
             if(e.hitBy(hero)){
                 hero.hp-- ;
+                hero.lv = 0 ;
                 eps.remove(e);
                 if(hero.hp <= 0){
                     gameover = true ;
-//                    hero.hp = 5 ;
-//                    score = 0 ;
                 }
             }
         }
     }
-
-    private void gremove() {
-        for (int i = 0; i < fs.size(); i++) {
-            Fire f = fs.get(i);
+    private void gremove() {//清除屏幕外子弹
+        for (int i = 0; i < hero.fs.size(); i++) {
+            Fire f = hero.fs.get(i);
             if (f.x < 0 && f.y < 0) {
-                fs.remove(f);
+                hero.fs.remove(f);
             }
         }
     }
-
     private void shootEp() {//射击敌机
-        for (int i = 0; i < fs.size(); i++) {
-            Fire f = fs.get(i);
+        for (int i = 0; i < hero.fs.size(); i++) {
+            Fire f = hero.fs.get(i);
             bang(f);
         }
     }
-
     private void bang(Fire f) {//击中判定
         for (int i = 0; i < eps.size(); i++) {
             Ep e = eps.get(i);
@@ -84,16 +79,22 @@ public class GamePanel extends JPanel {
                 if(e.hp <= 0){
                     eps.remove(e);
                     score++;
+                    if(e.type == 12 ){
+                        if(hero.lv < 2) {
+                            hero.lv++;
+                        }else if (hero.hp <8 ){
+                            hero.hp++;
+                        }else if(hero.power > 10){
+                            hero.power -- ;
+                        }
+                    }
                 }
-                fs.remove(f);
+                hero.fs.remove(f);
         }
         }
     }
-
-    int index = 0 ;//记录生产敌机方法执行次数
-    int findex = 0 ;
     private void fireMove() {
-        for(Fire f : fs){
+        for(Fire f : hero.fs){
             f.move();
         }
     }
@@ -103,33 +104,15 @@ public class GamePanel extends JPanel {
             e.move();
         }
     }
-
     protected void epEnter(){
         //生成敌机
         index++;
-        if(index == 20) {//方法每执行20次生成一个敌机
+        if(index == 30) {//方法每执行20次生成一个敌机
             Ep e = new Ep();
             eps.add(e);
             index = 0 ;
         }
     }
-    public void shoot() {
-        //生成，发射子弹
-        findex++;
-        if(findex >=10) {//攻速
-            //左
-            Fire fire1 = new Fire(hero.x + 15, hero.y , 0);
-            fs.add(fire1);
-            //中
-            Fire fire2 = new Fire(hero.x + 45, hero.y - 20 ,1);
-            fs.add(fire2);
-            //右
-            Fire fire3 = new Fire(hero.x + 75, hero.y, 2);
-            fs.add(fire3);
-            findex = 0 ;
-        }
-    }
-
     public GamePanel (GameFrame frame){
         setBackground(Color.BLACK);//设置背景色
 
@@ -147,6 +130,13 @@ public class GamePanel extends JPanel {
                     gameover = false ;
                     score = 0 ;
                     hero = new Hero();
+                    Random r = new Random();
+                    int rbg = r.nextInt(5) + 1 ;
+                    try {
+                        bg = App.getImg("/img/bg"+ rbg +".jpg");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                     repaint();
                 }
             }
@@ -192,7 +182,7 @@ public class GamePanel extends JPanel {
 
     g.drawImage(bg,0,0,null);//绘制背景图
 
-        for (Fire fire : fs) {//绘制子弹
+        for (Fire fire : hero.fs) {//绘制子弹
             g.drawImage(fire.img,fire.x,fire.y,fire.w,fire.h,null);
         }
 

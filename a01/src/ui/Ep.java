@@ -6,10 +6,12 @@ import java.util.Random;
 public class Ep extends FlyObjeck{
     int sp ;//敌机速度
     int hp ;
+    int type ;
     public Ep (){
         Random rd = new Random();
         int r = rd.nextInt(15);
         String in = "/img/ep"+r+".png";
+        type = r ;
         try {
             img = App.getImg(in);
         } catch (IOException e) {
@@ -24,6 +26,14 @@ public class Ep extends FlyObjeck{
     }
 
     public void move() {
+        if(type == 5 ){
+            x-=5;
+            y += sp ;
+        }
+        if(type == 7){
+            x+=5;
+            y += sp ;
+        }
         y += sp ;
     }
 
